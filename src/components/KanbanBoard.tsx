@@ -44,7 +44,6 @@ export function KanbanBoard() {
         setTasks(newTasks)
     }
     function onDragStart(event: DragStartEvent) {
-        console.log("Drag Start", event)
         if (event.active.data.current?.type === "Column") {
             setActiveColumn(event.active.data.current.column)
             return;
@@ -61,16 +60,18 @@ export function KanbanBoard() {
         if (!over) {
             return
         }
-
+        if (active.data.current?.type !== "Column" || over.data.current?.type !== "Column") return
         const activeColumnId = active.id //Coluna capturada
         const overColumnId = over.id //Coluna que a coluna capturada está por cima 
 
         if (activeColumnId === overColumnId) return
 
 
+
         setColumns((columns) => {
             const activColumnIndex = columns.findIndex((col) => col.id === activeColumnId)
             const overColumnIndex = columns.findIndex(col => col.id === overColumnId)
+            console.log("Chegou aqui", activColumnIndex, overColumnIndex)
 
             return arrayMove(columns, activColumnIndex, overColumnIndex) //reconstrou o array invertendo a posição de cada coluna
         })
@@ -109,19 +110,16 @@ export function KanbanBoard() {
         if (!over) {
             return
         }
-
         const activeId = active.id
         const overId = over.id
-
         if (activeId === overId) return
+        const isActiveATask = active.data.current?.type === "Task"
+        const isOverATask = over.data.current?.type === "Task"
 
-        const isActiveTask = active.data.current?.type === "Task"
-        const isOverTask = over.data.current?.type === "Task"
-
-        if (!isActiveTask) return
+        if (!isActiveATask) return
 
 
-        if (isActiveTask && isOverTask) {
+        if (isActiveATask && isOverATask) {
             setTasks((tasks) => {
                 const activeIndex = tasks.findIndex(t => t.id === activeId)
                 const overIndex = tasks.findIndex((t) => t.id === overId)
@@ -136,9 +134,7 @@ export function KanbanBoard() {
         if (activeTask && isOverAColumn) {
             setTasks((tasks) => {
                 const activeIndex = tasks.findIndex(t => t.id === activeId)
-
                 tasks[activeIndex].columnId = overId
-
                 return arrayMove(tasks, activeIndex, activeIndex)
             })
         }
